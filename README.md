@@ -37,6 +37,9 @@ npm run dev
 ```
 
 ### Demo Login
+
+> **Note:** The Admin credentials (`admin@eco.com` / `admin123`) are already pre-filled on the login page for convenience. You can simply click **"Login"** to access the dashboard immediately without entering anything!
+
 | Email | Password | Role |
 |---|---|---|
 | admin@eco.com | admin123 | Admin |
