@@ -1,16 +1,14 @@
 const express = require('express');
 const { body } = require('express-validator');
 const ctrl = require('../controllers/governanceController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
-const { rbac } = require('../middleware/rbac');
 
 const router = express.Router();
-router.use(authenticate);
+router.use(authenticate, authorize('admin', 'compliance_officer'));
 
 router.get('/policies', ctrl.getPolicies);
 router.post('/policies',
-  rbac('admin','compliance_officer'),
   [body('title').notEmpty(), body('content').notEmpty()],
   validate, ctrl.createPolicy
 );

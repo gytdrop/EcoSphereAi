@@ -1,9 +1,9 @@
 const express = require('express');
 const ctrl = require('../controllers/gamificationController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
-router.use(authenticate);
+router.use(authenticate, authorize('admin', 'hr_manager', 'employee'));
 
 router.get('/challenges', ctrl.getChallenges);
 router.post('/challenges/:id/join', ctrl.joinChallenge);

@@ -1,11 +1,11 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { advisor, simulate } = require('../controllers/aiController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 
 const router = express.Router();
-router.use(authenticate);
+router.use(authenticate, authorize('admin', 'sustainability_manager'));
 
 router.post('/advisor', advisor);
 router.post('/simulate',

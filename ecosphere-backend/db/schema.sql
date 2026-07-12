@@ -31,8 +31,8 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(150) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL DEFAULT 'employee'
-    CHECK (role IN ('admin', 'sustainability_manager', 'hr_manager', 'compliance_officer', 'employee', 'executive')),
+  role VARCHAR(30) NOT NULL DEFAULT 'employee'
+    CHECK (role IN ('admin', 'sustainability_manager', 'hr_manager', 'compliance_officer', 'employee')),
   department VARCHAR(100),
   xp INTEGER DEFAULT 0,
   avatar_url VARCHAR(255),
