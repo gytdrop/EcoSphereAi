@@ -79,50 +79,47 @@ Weights are configurable via the `esg_weights` table.
 
 ## Platform Overview & Features
 
-Our platform is divided into several powerful modules to tackle enterprise ESG challenges holistically. Below is a detailed breakdown of each feature, accompanied by interactive screenshots showing the application in action.
+Our platform is divided into several powerful modules to tackle enterprise ESG challenges holistically. Below is the presentation flow for our live demo:
 
-### 1. Centralized ESG Dashboard
-The **Dashboard** serves as the command center for sustainability officers. It features high-level metrics, real-time KPI tracking, and interactive charts that visualize carbon emissions, social engagement, and governance compliance over time.
-* **Interactive Tooltips**: Hovering over the graphs displays granular data points for precise analysis.
-![Dashboard Chart Hover](assets/dashboard-hover.png)
+### 1. Role-Based Login
+Every user logs into the system with role-based access. Different stakeholders such as Administrators, Sustainability Managers, HR Managers, Compliance Officers, and Employees have different permissions and see only the modules relevant to their responsibilities.
+![Login Page](assets/login.png) 
+
+### 2. Centralized ESG Dashboard
+This is our centralized ESG dashboard. Instead of checking multiple systems, management gets a complete overview in one place. Here we can see the overall ESG score, environmental performance, social engagement, governance status, recent activities, and critical alerts. This helps management quickly identify areas that require attention.
 ![Dashboard Overview](assets/dashboard.png)
+![Dashboard Chart Hover](assets/dashboard-hover.png)
 
-### 2. Environmental Management
-The **Environmental** module tracks Scope 1, 2, and 3 emissions. Users can dynamically add new energy consumption logs, waste metrics, or water usage data.
-* **Dynamic Modals**: Users can click "Record Transaction" to quickly log new data without leaving the page. 
-![Environmental Data Modal](assets/environmental-modal.png)
+### 3. Environmental Module
+This module manages all environmental activities. Organizations can record carbon emissions, monitor sustainability initiatives, configure emission factors, and track environmental goals. Every environmental activity automatically contributes to the organization's ESG score.
 ![Environmental Page](assets/environmental.png)
 
-### 3. Social Impact & Community
-The **Social** module manages employee volunteering, community initiatives, and diversity metrics. 
-* **Interactive Approval Flows**: Managers can click on individual social activities to approve or reject them directly from intuitive interactive modals.
-![Social Activity Modal](assets/social-modal.png)
+### 4. Social Module
+The Social module focuses on employee engagement and CSR activities. HR can create sustainability campaigns and CSR events, while employees participate and contribute to the organization's social impact. Approved activities improve the Social score automatically.
 ![Social Page](assets/social.png)
+![Social Activity Modal](assets/social-modal.png)
 
-### 4. Governance & Compliance
-The **Governance** module ensures that the organization remains compliant with regional frameworks like GDPR, CSRD, and ISO certifications. It provides automated checklists, policy tracking, and audit readiness scores.
+### 5. Governance Module
+Governance ensures compliance and transparency within the organization. Here, compliance officers manage company policies, audits, and compliance issues. The system tracks pending actions and helps organizations remain compliant with ESG standards.
 ![Governance](assets/governance.png)
 
-### 5. Gamification & Leaderboard
-To drive grassroots employee engagement, the **Gamification** module tracks individual and departmental contributions to sustainability goals. Employees earn XP and badges for sustainable actions, fostering a culture of positive impact.
+### 6. Gamification
+To drive grassroots employee engagement, the Gamification module tracks individual and departmental contributions to sustainability goals. Employees earn XP and badges for sustainable actions, fostering a culture of positive impact.
 ![Gamification](assets/gamification.png)
 
-### 6. Groq-Powered AI Advisor
-Our **AI Advisor** leverages the blazing-fast Groq LPU engine to provide real-time sustainability insights, tailored policy recommendations, and dynamic answers to complex ESG questions based on the enterprise's live data.
+### 7. AI / Executive Insights
+One of the unique aspects of EcoSphere AI is our Intelligence Layer. Instead of simply displaying reports, the platform uses intelligent analysis to assist management in making better sustainability decisions by analyzing organizational ESG data and providing actionable recommendations.
 ![AI Advisor](assets/ai-advisor.png)
-
-#### AI Advisor Output
-By clicking "Generate Report", the Groq-powered model analyzes the latest enterprise metrics and outputs a comprehensive Executive ESG Report, highlighting strengths, vulnerabilities, and high-impact priority actions.
 ![AI Advisor Result](assets/ai-advisor-result.png)
 
-### 7. ESG Simulator
-The **ESG Simulator** allows decision-makers to model the potential impact of future business choices—like adopting 100% renewable energy or altering supply chains.
+### 8. ESG Simulator
+Organizations often want to know the impact of sustainability initiatives before investing resources. Our Smart ESG Score Simulator allows management to evaluate different strategies and instantly predicts how those initiatives could improve the overall ESG score, enabling comparison of multiple strategies before implementation.
 ![ESG Simulator](assets/simulator.png)
-
-#### Live Simulation Results
-By adjusting the sliders, users can instantly see how hypothetical changes will affect their projected Environmental, Social, and Governance scores.
 ![Simulator Results](assets/simulator-result.png)
 
-### 8. Reports & Analytics
-Generate comprehensive, board-ready ESG reports for stakeholders and investors, highlighting compliance readiness, historical progress, and future trajectories.
+### 9. Reports & Analytics
+Finally, the platform generates comprehensive ESG reports and analytics that can be exported and shared with stakeholders for compliance and sustainability reporting.
 ![Reports](assets/reports.png)
+
+## Conclusion
+EcoSphere AI is more than an ESG reporting tool. It is an enterprise decision-support platform that combines ESG management, workflow automation, analytics, and intelligent insights into a single solution.

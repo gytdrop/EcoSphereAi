@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
   /* Primary */
-  --primary: #111827;
-  --primary-dark: #000000;
-  --primary-light: #374151;
-  --primary-muted: rgba(17, 24, 39, 0.05);
+  --primary: #0F172A;
+  --primary-dark: #020617;
+  --primary-light: #334155;
+  --primary-muted: rgba(15, 23, 42, 0.05);
 
-  /* Surfaces - Agency Light */
-  --surface: #F9FAFB;
-  --surface-2: rgba(255, 255, 255, 0.7);
-  --surface-3: rgba(255, 255, 255, 0.9);
-  --surface-4: #FFFFFF;
+  /* Surfaces - Enterprise */
+  --surface: #F8FAFC;
+  --surface-2: #FFFFFF;
+  --surface-3: #F1F5F9;
+  --surface-4: #E2E8F0;
 
   /* Borders */
   --border: rgba(0,0,0,0.08);
@@ -33,14 +33,14 @@
   --success: #10B981;
   --info: #6B7280;
 
-  /* Layout */
-  --radius: 16px;
-  --radius-sm: 8px;
-  --sidebar-width: 240px; 
+  /* Layout - Compact */
+  --radius: 4px;
+  --radius-sm: 2px;
+  --sidebar-width: 220px; 
 
   /* Shadows - Minimalist */
-  --shadow-sm: 0 4px 20px rgba(0,0,0,0.04);
-  --shadow: 0 10px 40px rgba(0,0,0,0.08);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
 }
 
 * {
@@ -52,16 +52,16 @@
 body {
   background-color: var(--surface);
   color: var(--text-primary);
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-  font-size: 15px; /* Slightly larger for Outfit */
-  line-height: 1.6;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 13px; /* Compact ERP sizing */
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Enforce medium weight over bold */
 h1, h2, h3, h4, h5, h6, strong, b {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 500; 
   color: var(--text-primary);
 }
@@ -77,12 +77,10 @@ h1, h2, h3, h4, h5, h6, strong, b {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 20px; 
+  padding: 12px 16px; 
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 /* ===================== KPI Widget (compact horizontal) ===================== */
@@ -90,13 +88,11 @@ h1, h2, h3, h4, h5, h6, strong, b {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 20px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 .kpi-card:hover {

@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { TrendingUp, TrendingDown, Leaf, Users, Shield, AlertTriangle } from 'lucide-react'
+import { TrendingUp, TrendingDown, Leaf, Users, Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { dashboardService } from '../services/dashboard.service'
 import { PageLoader } from '../components/ui/Spinner'
 import { useAuthStore } from '../store/authStore'
-import { motion } from 'framer-motion'
+import DataTable from '../components/ui/DataTable'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: 'rgba(250,250,250,0.95)', backdropFilter: 'blur(10px)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>{label}</div>
+      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '8px 12px', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>{label}</div>
         {payload.map((p) => (
-          <div key={p.name} style={{ color: '#111827', fontSize: 15, fontWeight: 700 }}>
+          <div key={p.name} style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
             {p.value?.toLocaleString()} kg CO₂
           </div>
         ))}
@@ -22,48 +22,35 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
-}
-
 function KpiCard({ label, value, sub, color, trend }) {
   return (
-    <motion.div variants={cardVariants} className="kpi-card" whileHover={{ scale: 1.02 }}>
-      <div className="kpi-label">{label}</div>
-      <div className="kpi-value" style={{ color: color || 'var(--text-primary)' }}>
+    <div className="card" style={{ padding: '12px 16px' }}>
+      <div style={{ fontSize: 11, color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 600, color: color || 'var(--text-primary)', marginTop: 4, display: 'flex', alignItems: 'center' }}>
         {value}
-        {trend === 'up' && <TrendingUp size={16} color="var(--success)" style={{ marginLeft: 8, verticalAlign: 'middle' }} />}
-        {trend === 'down' && <TrendingDown size={16} color="var(--danger)" style={{ marginLeft: 8, verticalAlign: 'middle' }} />}
+        {trend === 'up' && <TrendingUp size={14} color="var(--success)" style={{ marginLeft: 6 }} />}
+        {trend === 'down' && <TrendingDown size={14} color="var(--danger)" style={{ marginLeft: 6 }} />}
       </div>
-      {sub && <div className="kpi-sub">{sub}</div>}
-    </motion.div>
+      {sub && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{sub}</div>}
+    </div>
   )
 }
 
 function ScoreKpi({ label, score, icon: Icon }) {
-  const color = score >= 75 ? '#111827' : score >= 50 ? 'var(--warning)' : 'var(--danger)'
+  const color = score >= 75 ? 'var(--text-primary)' : score >= 50 ? 'var(--warning)' : 'var(--danger)'
   return (
-    <motion.div variants={cardVariants} className="kpi-card" whileHover={{ scale: 1.02 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <div style={{ background: 'rgba(0,0,0,0.05)', padding: 6, borderRadius: 6 }}>
-          <Icon size={14} color={color} />
-        </div>
-        <span className="kpi-label">{label}</span>
+    <div className="card" style={{ padding: '12px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <Icon size={14} color={color} />
+        <span style={{ fontSize: 11, color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>{label}</span>
       </div>
-      <div className="kpi-value" style={{ color }}>
-        {score}<span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 2 }}>/100</span>
+      <div style={{ fontSize: 18, fontWeight: 600, color }}>
+        {score}<span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>/100</span>
       </div>
-      <div className="progress-bar" style={{ marginTop: 12, height: 3, background: 'rgba(0,0,0,0.1)' }}>
-        <motion.div 
-          className="progress-fill" 
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-          style={{ background: color, height: '100%', borderRadius: 99 }} 
-        />
+      <div style={{ marginTop: 8, height: 4, background: 'var(--surface-3)', borderRadius: 2 }}>
+        <div style={{ width: `${score}%`, background: color, height: '100%', borderRadius: 2 }} />
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -77,142 +64,98 @@ export default function DashboardPage() {
 
   if (isLoading) return <PageLoader />
   if (error) return (
-    <div className="alert alert-danger" style={{ marginTop: 24 }}>
-      Failed to load dashboard data.
+    <div style={{ padding: 16, background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>
+      Failed to load enterprise dashboard data.
     </div>
   )
 
   const { scores, leaderboard, compliance, csr, emissionTrend } = data
 
+  const leaderboardColumns = [
+    { key: 'name', label: 'Employee', render: (val, row) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, border: '1px solid var(--border)' }}>{val.charAt(0)}</div>
+        <div style={{ fontSize: 12, fontWeight: 500 }}>{val}</div>
+      </div>
+    )},
+    { key: 'department', label: 'Department', render: (val) => <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{val}</span> },
+    { key: 'xp', label: 'Impact Score', render: (val) => <span style={{ fontWeight: 600 }}>{val} <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 400 }}>XP</span></span> }
+  ]
+
   return (
-    <motion.div 
-      initial="hidden" 
-      animate="visible" 
-      variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-    >
-      {/* Page header */}
-      <motion.div variants={cardVariants} className="page-header" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: 24, marginBottom: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Header */}
+      <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 400, color: '#111827', letterSpacing: '-0.02em' }}>Intelligence Center</h1>
-          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>Welcome back, {user?.name}. Here is your enterprise sustainability overview.</p>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>Enterprise Overview</h1>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Welcome, {user?.name} | {new Date().toLocaleDateString()}</p>
         </div>
-      </motion.div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost" style={{ fontSize: 12, padding: '6px 12px' }}>Export PDF</button>
+          <button className="btn btn-primary" style={{ fontSize: 12, padding: '6px 12px' }}>Generate Report</button>
+        </div>
+      </div>
 
-      {/* Compliance alert */}
-      {compliance.open_issues > 0 && (
-        <motion.div variants={cardVariants} className="alert alert-danger" style={{ marginBottom: 24, padding: '16px 20px', borderRadius: 12, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)' }}>
-          <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F87171" />
-          <span style={{ color: '#FCA5A5' }}>
-            <strong style={{ color: '#111827' }}>{compliance.open_issues} open compliance issues</strong> — {compliance.critical_issues} critical, {compliance.overdue_issues} overdue.
-            {' '}<span style={{ color: 'rgba(0,0,0,0.6)' }}>Review in the Governance module.</span>
+      {/* Alerts */}
+      <div style={{ display: 'flex', gap: 12 }}>
+        {compliance.open_issues > 0 && (
+          <div style={{ flex: 1, padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <AlertTriangle size={14} color="var(--danger)" />
+            <span style={{ fontSize: 12, color: 'var(--danger)' }}>
+              <strong>{compliance.open_issues} Open Compliance Issues</strong> ({compliance.critical_issues} critical, {compliance.overdue_issues} overdue)
+            </span>
+          </div>
+        )}
+        <div style={{ flex: 1, padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'var(--warning-bg)', border: '1px solid var(--warning-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Clock size={14} color="var(--warning)" />
+          <span style={{ fontSize: 12, color: '#92400E' }}>
+            <strong>3 Pending Approvals</strong> require your review in the Social module.
           </span>
-        </motion.div>
-      )}
+        </div>
+      </div>
 
-      {/* ESG Score KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 16 }}>
-        <ScoreKpi label="ESG Rating" score={scores.overall} icon={TrendingUp} />
+      {/* Main KPIs */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <ScoreKpi label="Overall ESG" score={scores.overall} icon={TrendingUp} />
         <ScoreKpi label="Environmental" score={scores.environmental} icon={Leaf} />
         <ScoreKpi label="Social" score={scores.social} icon={Users} />
         <ScoreKpi label="Governance" score={scores.governance} icon={Shield} />
       </div>
 
       {/* Secondary KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <KpiCard
-          label="Active CSR Programs"
-          value={csr.active_csr}
-          sub={`${csr.total_participants} total participants`}
-          color="#111827"
-        />
-        <KpiCard
-          label="Open Issues"
-          value={compliance.open_issues}
-          sub={`${compliance.critical_issues} critical`}
-          color={Number(compliance.open_issues) > 3 ? 'var(--danger)' : 'var(--warning)'}
-        />
-        <KpiCard
-          label="Overdue Actions"
-          value={compliance.overdue_issues}
-          sub="Require immediate attention"
-          color={Number(compliance.overdue_issues) > 0 ? 'var(--danger)' : '#111827'}
-        />
-        <KpiCard
-          label="Weight Config (E/S/G)"
-          value={`${scores.weights.environmental}/${scores.weights.social}/${scores.weights.governance}`}
-          sub="Current scoring model"
-          color="#111827"
-        />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <KpiCard label="Active CSR Programs" value={csr.active_csr} sub={`${csr.total_participants} participants`} />
+        <KpiCard label="Open Issues" value={compliance.open_issues} sub={`${compliance.critical_issues} critical`} color={Number(compliance.open_issues) > 3 ? 'var(--danger)' : 'var(--warning)'} />
+        <KpiCard label="Overdue Actions" value={compliance.overdue_issues} sub="Require immediate attention" color={Number(compliance.overdue_issues) > 0 ? 'var(--danger)' : ''} />
+        <KpiCard label="Weight Config (E/S/G)" value={`${scores.weights.environmental}/${scores.weights.social}/${scores.weights.governance}`} sub="Current scoring model" />
       </div>
 
-      {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
-
-        {/* Emission Trend */}
-        <motion.div variants={cardVariants} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="toolbar" style={{ background: 'rgba(0,0,0,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-            <span className="toolbar-title" style={{ fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Emissions Trajectory</span>
-            <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)' }}>Monthly CO₂ (kg)</span>
+      {/* Layout Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 16 }}>
+        {/* Charts */}
+        <div className="card" style={{ padding: 0 }}>
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-3)' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Emissions Trajectory</span>
           </div>
-          <div style={{ padding: '24px 24px 16px' }}>
-            <ResponsiveContainer width="100%" height={240}>
+          <div style={{ padding: '16px' }}>
+            <ResponsiveContainer width="100%" height={220}>
               <LineChart data={emissionTrend} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.1)', strokeWidth: 1 }} />
-                <Line
-                  type="monotone"
-                  dataKey="total_emissions"
-                  name="CO₂ Emissions"
-                  stroke="#111827"
-                  strokeWidth={2}
-                  dot={{ fill: '#000', stroke: '#111827', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, fill: '#111827' }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} dy={8} />
+                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border)' }} />
+                <Line type="monotone" dataKey="total_emissions" stroke="var(--primary)" strokeWidth={2} dot={{ fill: 'var(--surface)', stroke: 'var(--primary)', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, fill: 'var(--primary)' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Leaderboard */}
-        <motion.div variants={cardVariants} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="toolbar" style={{ background: 'rgba(0,0,0,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-            <span className="toolbar-title" style={{ fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Top Contributors</span>
-          </div>
-          <div style={{ padding: '8px 0' }}>
-            <table style={{ width: '100%' }}>
-              <thead>
-                <tr>
-                  <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 10, color: 'rgba(0,0,0,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Employee</th>
-                  <th style={{ padding: '12px 20px', textAlign: 'right', fontSize: 10, color: 'rgba(0,0,0,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Impact</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard?.slice(0, 6).map((u, i) => (
-                  <tr key={u.id} style={{ borderBottom: i !== 5 ? '1px solid rgba(0,0,0,0.03)' : 'none' }}>
-                    <td style={{ padding: '12px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{
-                          width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 11, color: '#111827', fontWeight: 500, border: '1px solid var(--border)'
-                        }}>
-                          {u.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{u.name}</div>
-                          <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)' }}>{u.department}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 20px', textAlign: 'right', fontSize: 13, fontWeight: 500, color: '#111827' }}>{u.xp} <span style={{ color: 'rgba(0,0,0,0.4)', fontSize: 11 }}>XP</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
+        {/* Top Contributors */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: 8 }}>Top Contributors</div>
+          <DataTable columns={leaderboardColumns} data={leaderboard || []} rowsPerPage={5} />
+        </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

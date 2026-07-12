@@ -128,13 +128,11 @@ export default function LoginPage() {
         <div style={{ 
           width: '100%', 
           maxWidth: 400,
-          background: 'rgba(10, 10, 10, 0.6)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: '#FFFFFF',
           border: '1px solid var(--border)',
-          borderRadius: 24,
+          borderRadius: 16,
           padding: '40px',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.5)'
+          boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
         }}>
           <div ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div>
@@ -231,9 +229,9 @@ export default function LoginPage() {
                   marginTop: 12, 
                   padding: '14px', 
                   fontSize: 14,
-                  background: '#111827',
-                  color: '#000000',
-                  borderRadius: 12,
+                  background: 'var(--primary)',
+                  color: '#FFFFFF',
+                  borderRadius: 8,
                   fontWeight: 600,
                   border: 'none',
                   cursor: 'pointer'

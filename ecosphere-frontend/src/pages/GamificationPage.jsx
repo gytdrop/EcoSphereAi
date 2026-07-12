@@ -142,7 +142,7 @@ export default function GamificationPage() {
                   <th>Department</th>
                   <th style={{ textAlign: 'right' }}>XP</th>
                   <th style={{ textAlign: 'center' }}>Badges</th>
-                  <th style={{ textAlign: 'center' }}>Challenges</th>
+                  <th style={{ textAlign: 'center' }}>Activities</th>
                 </tr>
               </thead>
               <tbody>

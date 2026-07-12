@@ -52,14 +52,16 @@ const joinCSRActivity = async (req, res, next) => {
     }
 
     // Insert participant (unique constraint prevents duplicates)
-    await query(
-      'INSERT INTO csr_participants (activity_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+    const insertResult = await query(
+      'INSERT INTO csr_participants (activity_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *',
       [activityId, req.user.id]
     );
 
-    // Award XP
-    if (activity.xp_reward) {
+    // Award XP only if newly joined
+    if (insertResult.rows.length > 0 && activity.xp_reward) {
       await User.updateXP(req.user.id, activity.xp_reward);
+      const gamificationController = require('./gamificationController');
+      await gamificationController.checkAndAwardBadges(req.user.id);
     }
 
     res.json({ success: true, message: 'Successfully joined the CSR activity.', xpEarned: activity.xp_reward });

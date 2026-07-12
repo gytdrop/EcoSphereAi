@@ -70,10 +70,12 @@ const getLeaderboard = async (req, res, next) => {
     const result = await query(`
       SELECT u.id, u.name, u.department, u.xp, u.role,
              COUNT(DISTINCT ub.badge_id) AS badge_count,
-             COUNT(DISTINCT uc.challenge_id) FILTER (WHERE uc.status = 'completed') AS challenges_completed
+             (COUNT(DISTINCT uc.challenge_id) FILTER (WHERE uc.status = 'completed') + 
+              COUNT(DISTINCT cp.activity_id)) AS challenges_completed
       FROM users u
       LEFT JOIN user_badges ub ON ub.user_id = u.id
       LEFT JOIN user_challenges uc ON uc.user_id = u.id
+      LEFT JOIN csr_participants cp ON cp.user_id = u.id
       WHERE u.is_active = TRUE
       GROUP BY u.id
       ORDER BY u.xp DESC
@@ -162,5 +164,5 @@ async function checkAndAwardBadges(userId) {
 
 module.exports = {
   getChallenges, joinChallenge, completeChallenge,
-  getLeaderboard, getBadges, getRewards, redeemReward,
+  getLeaderboard, getBadges, getRewards, redeemReward, checkAndAwardBadges
 };

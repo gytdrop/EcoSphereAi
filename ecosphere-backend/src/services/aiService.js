@@ -72,21 +72,69 @@ GOVERNANCE DATA:
 - Policy Acknowledgement Rate: ${esgData.governance.ackRate}%
 - Upcoming Audits: ${esgData.governance.upcomingAudits}`;
 
-  if (!client) throw new Error('No AI provider configured. Add GROQ_API_KEY or OPENAI_API_KEY to .env');
+  try {
+    if (!client) throw new Error('No AI provider configured.');
 
-  const response = await client.chat.completions.create({
-    model: modelName,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userMessage },
-    ],
-    response_format: { type: 'json_object' },
-    temperature: 0.3,
-    max_tokens: 2000,
-  });
+    const response = await client.chat.completions.create({
+      model: modelName,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.3,
+      max_tokens: 2000,
+    });
 
-  const content = response.choices[0].message.content;
-  return JSON.parse(content);
+    const content = response.choices[0].message.content;
+    return JSON.parse(content);
+  } catch (err) {
+    console.error('AI Advisor Error, falling back to deterministic response:', err.message);
+    
+    // Deterministic fallback based on raw scores
+    const overall = esgData.scores.overall;
+    const rating = overall >= 80 ? 'Excellent' : overall >= 60 ? 'Good' : overall >= 40 ? 'Moderate' : 'Poor';
+    
+    return {
+      summary: `The organisation is currently performing at a ${rating} level with an overall score of ${overall}/100. Environmental metrics show ${esgData.environment.totalEmissions} kg CO2 emissions, while Governance indicates ${esgData.governance.openIssues} open compliance issues.`,
+      overallRating: rating,
+      strengths: [
+        esgData.scores.social >= 70 ? 'Strong social participation and training engagement' : 'Baseline social policies established',
+        esgData.scores.environmental >= 70 ? 'Effective emission tracking and reduction goals' : 'Carbon footprint monitoring is active'
+      ],
+      problems: [
+        ...(esgData.governance.openIssues > 0 ? [{
+          area: 'Governance',
+          issue: 'Open Compliance Issues',
+          detail: `There are ${esgData.governance.openIssues} open issues (${esgData.governance.criticalIssues} critical).`,
+          impact: 'Regulatory risk and potential fines'
+        }] : []),
+        ...(esgData.social.pendingCSR > 0 ? [{
+          area: 'Social',
+          issue: 'Pending CSR Approvals',
+          detail: `There are ${esgData.social.pendingCSR} CSR activities awaiting approval.`,
+          impact: 'Delays in community engagement and employee participation'
+        }] : [])
+      ],
+      recommendations: [
+        ...(esgData.governance.criticalIssues > 0 ? [{
+          priority: 'Critical',
+          area: 'Governance',
+          action: 'Resolve Critical Compliance Issues',
+          detail: 'Immediately assign resources to clear overdue and critical governance tasks.',
+          expectedImpact: 'Reduce compliance risk and improve Governance score'
+        }] : []),
+        {
+          priority: 'Medium',
+          area: 'Environmental',
+          action: 'Review Top Emitters',
+          detail: `Investigate the operations of ${esgData.environment.topEmitter} to identify reduction opportunities.`,
+          expectedImpact: 'Lower total emissions and boost Environmental score'
+        }
+      ],
+      managementInsight: 'Prioritize resolving open compliance issues to safeguard enterprise reputation before launching new CSR campaigns.'
+    };
+  }
 }
 
 module.exports = { runESGAdvisor };

@@ -1,44 +1,84 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useMemo, useCallback } from 'react'
 import { Plus, Users, Heart, CheckCircle } from 'lucide-react'
-import { socialService } from '../services/social.service'
 import { useAuthStore } from '../store/authStore'
 import { PageLoader } from '../components/ui/Spinner'
-import Spinner from '../components/ui/Spinner'
-import { useState } from 'react'
+import DataTable from '../components/ui/DataTable'
+import { Form, FormGroup, Input, FormActions, SubmitButton } from '../components/ui/Form'
+import { useSocialData } from '../hooks/useSocialData'
 
 const STATUS_BADGE = {
-  pending:   { bg: 'rgba(107,114,128,0.12)',  color: '#9CA3AF',  label: 'Pending' },
-  approved:  { bg: 'rgba(34,197,94,0.10)',    color: '#4ADE80',  label: 'Approved' },
-  active:    { bg: 'rgba(34,197,94,0.10)',    color: '#22C55E',  label: 'Active' },
-  completed: { bg: 'rgba(107,114,128,0.10)',  color: '#9CA3AF',  label: 'Completed' },
-  cancelled: { bg: 'rgba(239,68,68,0.10)',    color: '#FCA5A5',  label: 'Cancelled' },
+  pending:   { bg: 'var(--surface-3)',  color: 'var(--text-secondary)',  label: 'Pending' },
+  approved:  { bg: 'var(--success)',    color: '#FFFFFF',  label: 'Approved' },
+  active:    { bg: 'var(--success)',    color: '#FFFFFF',  label: 'Active' },
+  completed: { bg: 'var(--surface-3)',  color: 'var(--text-secondary)',  label: 'Completed' },
+  cancelled: { bg: 'var(--danger)',     color: '#FFFFFF',  label: 'Cancelled' },
 }
 
 export default function SocialPage() {
-  const qc = useQueryClient()
   const { user } = useAuthStore()
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', category: '', start_date: '', end_date: '', target_participants: 20, xp_reward: 100 })
 
-  const { data: csrData, isLoading } = useQuery({ queryKey: ['social-csr'], queryFn: () => socialService.getCSR().then(r => r.data.data) })
-  const { data: trainingData } = useQuery({ queryKey: ['social-training'], queryFn: () => socialService.getTraining().then(r => r.data.data) })
-  const { data: diversityData } = useQuery({ queryKey: ['social-diversity'], queryFn: () => socialService.getDiversity().then(r => r.data.data) })
+  const { csr, training, diversity, isLoading, joinMutation, approveMutation, createMutation } = useSocialData()
 
-  const joinMutation = useMutation({ mutationFn: socialService.joinCSR, onSuccess: () => qc.invalidateQueries(['social-csr']) })
-  const approveMutation = useMutation({ mutationFn: socialService.approveCSR, onSuccess: () => qc.invalidateQueries(['social-csr']) })
-  const createMutation = useMutation({ mutationFn: socialService.createCSR, onSuccess: () => { qc.invalidateQueries(['social-csr']); setShowModal(false) } })
+  const canApprove = ['admin', 'sustainability_manager'].includes(user?.role)
+  const totalParticipants = useMemo(() => csr.reduce((s, a) => s + parseInt(a.participant_count || 0), 0), [csr])
+  const pendingCount = useMemo(() => csr.filter(a => a.status === 'pending').length, [csr])
+
+  const handleSubmit = useCallback(() => {
+    createMutation.mutate(form, {
+      onSuccess: () => {
+        setShowModal(false)
+        setForm({ title: '', description: '', category: '', start_date: '', end_date: '', target_participants: 20, xp_reward: 100 })
+      }
+    })
+  }, [form, createMutation])
+
+  const columns = useMemo(() => [
+    { key: 'title', label: 'Activity', render: (val, row) => (
+      <div>
+        <div style={{ fontWeight: 500 }}>{val}</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{row.description?.substring(0, 60)}</div>
+      </div>
+    )},
+    { key: 'category', label: 'Category' },
+    { key: 'status', label: 'Status', render: (val) => {
+      const cfg = STATUS_BADGE[val] || STATUS_BADGE.pending
+      return (
+        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500, background: cfg.bg, color: cfg.color }}>
+          {cfg.label}
+        </span>
+      )
+    }},
+    { key: 'participant_count', label: 'Participants', render: (val) => (
+      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <Users size={12} color="var(--text-muted)" /> {val}
+      </span>
+    )},
+    { key: 'xp_reward', label: 'XP Reward', render: (val) => <span style={{ fontWeight: 500, color: 'var(--primary)' }}>+{val} XP</span> },
+    { key: 'actions', label: 'Actions', sortable: false, render: (_, row) => (
+      <div style={{ display: 'flex', gap: 6 }}>
+        {['approved', 'active'].includes(row.status) && (
+          <button className="btn btn-primary btn-sm" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => joinMutation.mutate(row.id)} disabled={joinMutation.isPending}>
+            <Heart size={12} /> Join
+          </button>
+        )}
+        {canApprove && row.status === 'pending' && (
+          <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => approveMutation.mutate(row.id)} disabled={approveMutation.isPending}>
+            <CheckCircle size={12} /> Approve
+          </button>
+        )}
+      </div>
+    )}
+  ], [canApprove, joinMutation, approveMutation])
 
   if (isLoading) return <PageLoader />
 
-  const canApprove = ['admin', 'sustainability_manager'].includes(user?.role)
-  const totalParticipants = csrData?.reduce((s, a) => s + parseInt(a.participant_count || 0), 0) || 0
-  const pendingCount = csrData?.filter(a => a.status === 'pending').length || 0
-
   return (
     <div>
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
         <div>
-          <h1 className="page-title">Social Module</h1>
+          <h1 className="page-title">Social & Community</h1>
           <p className="page-subtitle">CSR activities, training programs, and diversity metrics</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
@@ -46,138 +86,63 @@ export default function SocialPage() {
         </button>
       </div>
 
-      {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
-        <div className="kpi-card">
-          <div className="kpi-label">Active CSR Activities</div>
-          <div className="kpi-value" style={{ color: 'var(--primary)' }}>{csrData?.filter(a => a.status === 'active').length || 0}</div>
-          <div className="kpi-sub">Currently running programs</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+        <div className="card">
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Active CSR Programs</div>
+          <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--primary)', marginTop: 4 }}>{csr.filter(a => a.status === 'active').length}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Currently running programs</div>
         </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Total Participants</div>
-          <div className="kpi-value">{totalParticipants}</div>
-          <div className="kpi-sub">Employees engaged in CSR</div>
+        <div className="card">
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Total Participants</div>
+          <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)', marginTop: 4 }}>{totalParticipants}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Employees engaged in CSR</div>
         </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Pending Approvals</div>
-          <div className="kpi-value" style={{ color: pendingCount > 0 ? 'var(--warning)' : 'var(--text-primary)' }}>{pendingCount}</div>
-          <div className="kpi-sub">Awaiting manager review</div>
+        <div className="card">
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Pending Approvals</div>
+          <div style={{ fontSize: 24, fontWeight: 600, color: pendingCount > 0 ? 'var(--warning)' : 'var(--text-primary)', marginTop: 4 }}>{pendingCount}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Awaiting manager review</div>
         </div>
       </div>
 
-      {/* Main area: CSR table + side panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 12, alignItems: 'start' }}>
-
-        {/* CSR Activities Table */}
-        <div className="card" style={{ padding: 0 }}>
-          <div className="toolbar">
-            <span className="toolbar-title">CSR Activities</span>
-            {pendingCount > 0 && (
-              <span className="badge badge-yellow">{pendingCount} pending approval</span>
-            )}
-          </div>
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Status</th>
-                  <th>Participants</th>
-                  <th>XP Reward</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {csrData?.map(activity => {
-                  const statusCfg = STATUS_BADGE[activity.status] || STATUS_BADGE.pending
-                  return (
-                    <tr key={activity.id} style={{ background: activity.status === 'pending' ? 'rgba(245,158,11,0.03)' : undefined }}>
-                      <td>
-                        <div style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: 12 }}>{activity.title}</div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>{activity.description?.substring(0, 60)}</div>
-                      </td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: 11 }}>{activity.category || '—'}</td>
-                      <td>
-                        <span style={{ display: 'inline-block', padding: '1px 7px', borderRadius: 4, fontSize: 11, fontWeight: 500, background: statusCfg.bg, color: statusCfg.color }}>
-                          {statusCfg.label}
-                        </span>
-                      </td>
-                      <td>
-                        <span style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Users size={11} color="var(--text-muted)" />
-                          {activity.participant_count}
-                        </span>
-                      </td>
-                      <td style={{ fontWeight: 500, color: 'var(--primary)', fontSize: 12 }}>+{activity.xp_reward} XP</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          {['approved', 'active'].includes(activity.status) && (
-                            <button className="btn btn-primary btn-sm" onClick={() => joinMutation.mutate(activity.id)} disabled={joinMutation.isPending}>
-                              <Heart size={11} /> Join
-                            </button>
-                          )}
-                          {canApprove && activity.status === 'pending' && (
-                            <button className="btn btn-ghost btn-sm" onClick={() => approveMutation.mutate(activity.id)}>
-                              <CheckCircle size={11} /> Approve
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-                {(!csrData || csrData.length === 0) && (
-                  <tr><td colSpan={6} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>No CSR activities found</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 16, alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: 8 }}>CSR Directory</div>
+          <DataTable columns={columns} data={csr} rowsPerPage={8} />
         </div>
 
-        {/* Right panels */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-          {/* Training Programs */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="card" style={{ padding: 0 }}>
-            <div className="toolbar">
-              <span className="toolbar-title">Training Programs</span>
-            </div>
-            <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {trainingData?.map(t => (
+            <div className="toolbar"><span className="toolbar-title">Training Programs</span></div>
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {training.map(t => (
                 <div key={t.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', flex: 1 }}>{t.title}</span>
-                    <span style={{ fontSize: 11, color: parseFloat(t.completion_rate) >= 80 ? 'var(--primary)' : 'var(--warning)', marginLeft: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>{t.title}</span>
+                    <span style={{ fontSize: 12, color: parseFloat(t.completion_rate) >= 80 ? 'var(--primary)' : 'var(--warning)' }}>
                       {parseFloat(t.completion_rate).toFixed(0)}%
                     </span>
                   </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${t.completion_rate}%`, background: parseFloat(t.completion_rate) >= 80 ? 'var(--primary)' : 'var(--warning)' }} />
+                  <div className="progress-bar" style={{ height: 6, borderRadius: 3 }}>
+                    <div className="progress-fill" style={{ width: `${t.completion_rate}%`, background: parseFloat(t.completion_rate) >= 80 ? 'var(--primary)' : 'var(--warning)', borderRadius: 3 }} />
                   </div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{t.duration_hours}h · {t.category}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{t.duration_hours}h · {t.category}</div>
                 </div>
               ))}
-              {(!trainingData || trainingData.length === 0) && (
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0' }}>No programs</div>
-              )}
+              {training.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>No programs</div>}
             </div>
           </div>
 
-          {/* Diversity */}
           <div className="card" style={{ padding: 0 }}>
-            <div className="toolbar">
-              <span className="toolbar-title">Diversity Overview</span>
-            </div>
-            <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {diversityData?.map(d => (
+            <div className="toolbar"><span className="toolbar-title">Diversity Overview</span></div>
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {diversity.map(d => (
                 <div key={d.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>{d.department}</span>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{parseFloat(d.gender_ratio || 0).toFixed(0)}% female</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>{d.department}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{parseFloat(d.gender_ratio || 0).toFixed(0)}% female</span>
                   </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${d.gender_ratio}%`, background: 'var(--surface-4)' }} />
+                  <div className="progress-bar" style={{ height: 6, borderRadius: 3 }}>
+                    <div className="progress-fill" style={{ width: `${d.gender_ratio}%`, background: 'var(--surface-4)', borderRadius: 3 }} />
                   </div>
                 </div>
               ))}
@@ -186,26 +151,33 @@ export default function SocialPage() {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 450 }}>
             <div className="modal-title">Create CSR Activity</div>
-            <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(form) }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div className="form-group"><label className="form-label">Title</label><input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required /></div>
-              <div className="form-group"><label className="form-label">Description</label><input className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
-              <div className="form-group"><label className="form-label">Category</label><input className="form-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Environment, Health, Education..." /></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div className="form-group"><label className="form-label">Start Date</label><input className="form-input" type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} /></div>
-                <div className="form-group"><label className="form-label">End Date</label><input className="form-input" type="date" value={form.end_date} onChange={e => setForm({ ...form, end_date: e.target.value })} /></div>
+            <Form onSubmit={handleSubmit}>
+              <FormGroup label="Title" required>
+                <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+              </FormGroup>
+              <FormGroup label="Description">
+                <Input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+              </FormGroup>
+              <FormGroup label="Category">
+                <Input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Environment, Health, Education..." />
+              </FormGroup>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <FormGroup label="Start Date">
+                  <Input type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} />
+                </FormGroup>
+                <FormGroup label="End Date">
+                  <Input type="date" value={form.end_date} onChange={e => setForm({ ...form, end_date: e.target.value })} />
+                </FormGroup>
               </div>
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
+              <FormActions>
                 <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? <Spinner size={14} /> : 'Create Activity'}
-                </button>
-              </div>
-            </form>
+                <SubmitButton isPending={createMutation.isPending}>Create Activity</SubmitButton>
+              </FormActions>
+            </Form>
           </div>
         </div>
       )}
