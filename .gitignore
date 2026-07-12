@@ -1,2 +1,6 @@
 instructions/
 instructions.zip
+
+
+*.cjs
+fix_colors.js
