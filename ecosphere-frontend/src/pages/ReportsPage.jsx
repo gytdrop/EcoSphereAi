@@ -23,6 +23,43 @@ export default function ReportsPage() {
 
   const { scores, emissionsByDept, emissionTrend, csrSummary, complianceSummary, topBadgeEarners, goalsSummary, generatedAt } = data
 
+  const handleExport = () => {
+    // Generate CSV content
+    const lines = []
+    lines.push('EcoSphere AI - ESG Report')
+    lines.push(`Generated At,${new Date(generatedAt).toLocaleString()}`)
+    lines.push('')
+    
+    lines.push('--- SCORES ---')
+    lines.push(`Overall ESG,${scores.overall}`)
+    lines.push(`Environmental,${scores.environmental}`)
+    lines.push(`Social,${scores.social}`)
+    lines.push(`Governance,${scores.governance}`)
+    lines.push('')
+    
+    lines.push('--- EMISSIONS BY DEPARTMENT ---')
+    lines.push('Department,Total CO2 (kg),Transactions')
+    emissionsByDept?.forEach(d => lines.push(`${d.department},${d.total_co2},${d.transactions}`))
+    lines.push('')
+    
+    lines.push('--- COMPLIANCE SUMMARY ---')
+    lines.push(`Total Issues,${complianceSummary?.total_issues}`)
+    lines.push(`Resolved,${complianceSummary?.resolved}`)
+    lines.push(`Open,${complianceSummary?.open}`)
+    lines.push(`Overdue,${complianceSummary?.overdue}`)
+    lines.push('')
+    
+    const csvContent = lines.join('\\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `esg_report_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -30,8 +67,8 @@ export default function ReportsPage() {
           <h1 className="page-title">ESG Report</h1>
           <p className="page-subtitle">Comprehensive sustainability performance report · Generated {new Date(generatedAt).toLocaleString()}</p>
         </div>
-        <button className="btn btn-ghost" onClick={() => window.print()}>
-          <Download size={14} /> Export
+        <button className="btn btn-primary" onClick={handleExport}>
+          <Download size={14} /> Export CSV
         </button>
       </div>
 
