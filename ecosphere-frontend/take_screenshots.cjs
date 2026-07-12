@@ -76,10 +76,8 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
   await page.goto('http://localhost:5173/ai-advisor', { waitUntil: 'domcontentloaded' });
   await wait(2000);
   try {
-    await page.type('textarea', 'How can we reduce our Scope 2 emissions quickly?');
-    await wait(500);
-    await page.click('.btn-primary'); // Run Analysis
-    await wait(6000); // AI generation takes a few seconds
+    await page.click('#run-advisor-btn'); // Run Analysis
+    await wait(8000); // AI generation takes a few seconds
     await page.screenshot({ path: '../assets/ai-advisor-result.png', fullPage: true });
     console.log('Saved ai-advisor-result.png');
   } catch (e) {
