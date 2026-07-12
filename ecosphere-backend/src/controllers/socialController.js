@@ -7,13 +7,14 @@ const getCSRActivities = async (req, res, next) => {
     const result = await query(`
       SELECT ca.*,
              u.name AS created_by_name,
-             COUNT(cp.id) AS participant_count
+             COUNT(cp.id) AS participant_count,
+             EXISTS(SELECT 1 FROM csr_participants WHERE activity_id = ca.id AND user_id = $1) AS has_joined
       FROM csr_activities ca
       LEFT JOIN users u ON ca.created_by = u.id
       LEFT JOIN csr_participants cp ON ca.id = cp.activity_id
       GROUP BY ca.id, u.name
       ORDER BY ca.created_at DESC
-    `);
+    `, [req.user.id]);
     res.json({ success: true, data: result.rows });
   } catch (err) {
     next(err);

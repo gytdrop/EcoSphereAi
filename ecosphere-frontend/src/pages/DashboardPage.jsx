@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { TrendingUp, TrendingDown, Leaf, Users, Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { dashboardService } from '../services/dashboard.service'
@@ -56,6 +57,7 @@ function ScoreKpi({ label, score, icon: Icon }) {
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
+  const navigate = useNavigate()
   const { data, isLoading, error } = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => dashboardService.get().then(r => r.data.data),
@@ -91,8 +93,8 @@ export default function DashboardPage() {
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Welcome, {user?.name} | {new Date().toLocaleDateString()}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-ghost" style={{ fontSize: 12, padding: '6px 12px' }}>Export PDF</button>
-          <button className="btn btn-primary" style={{ fontSize: 12, padding: '6px 12px' }}>Generate Report</button>
+          <button className="btn btn-ghost" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => window.print()}>Export PDF</button>
+          <button className="btn btn-primary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => navigate('/reports')}>Generate Report</button>
         </div>
       </div>
 

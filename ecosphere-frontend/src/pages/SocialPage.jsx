@@ -22,6 +22,7 @@ export default function SocialPage() {
   const { csr, training, diversity, isLoading, joinMutation, approveMutation, createMutation } = useSocialData()
 
   const canApprove = ['admin', 'sustainability_manager'].includes(user?.role)
+  const canCreate = ['admin', 'hr_manager', 'sustainability_manager'].includes(user?.role)
   const totalParticipants = useMemo(() => csr.reduce((s, a) => s + parseInt(a.participant_count || 0), 0), [csr])
   const pendingCount = useMemo(() => csr.filter(a => a.status === 'pending').length, [csr])
 
@@ -58,10 +59,15 @@ export default function SocialPage() {
     { key: 'xp_reward', label: 'XP Reward', render: (val) => <span style={{ fontWeight: 500, color: 'var(--primary)' }}>+{val} XP</span> },
     { key: 'actions', label: 'Actions', sortable: false, render: (_, row) => (
       <div style={{ display: 'flex', gap: 6 }}>
-        {['approved', 'active'].includes(row.status) && (
+        {['approved', 'active'].includes(row.status) && !row.has_joined && (
           <button className="btn btn-primary btn-sm" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => joinMutation.mutate(row.id)} disabled={joinMutation.isPending}>
             <Heart size={12} /> Join
           </button>
+        )}
+        {['approved', 'active', 'completed'].includes(row.status) && row.has_joined && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 500, color: 'var(--success)' }}>
+            <CheckCircle size={12} /> Joined
+          </span>
         )}
         {canApprove && row.status === 'pending' && (
           <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => approveMutation.mutate(row.id)} disabled={approveMutation.isPending}>
@@ -81,9 +87,11 @@ export default function SocialPage() {
           <h1 className="page-title">Social & Community</h1>
           <p className="page-subtitle">CSR activities, training programs, and diversity metrics</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={14} /> Create CSR Activity
-        </button>
+        {canCreate && (
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            <Plus size={14} /> Create CSR Activity
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>

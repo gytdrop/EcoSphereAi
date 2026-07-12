@@ -6,14 +6,14 @@ import {
 import { useAuthStore } from '../../store/authStore'
 
 const navItems = [
-  { path: '/dashboard',    label: 'Dashboard',     icon: LayoutDashboard },
-  { path: '/environment',  label: 'Environmental',  icon: Leaf },
-  { path: '/social',       label: 'Social',         icon: Users },
-  { path: '/governance',   label: 'Governance',     icon: Shield },
-  { path: '/gamification', label: 'Gamification',   icon: Trophy },
-  { path: '/ai-advisor',   label: 'AI Advisor',     icon: Brain },
-  { path: '/simulator',    label: 'ESG Simulator',  icon: FlaskConical },
-  { path: '/reports',      label: 'Reports',        icon: FileBarChart },
+  { path: '/dashboard',    label: 'Dashboard',     icon: LayoutDashboard, roles: ['admin', 'sustainability_manager', 'hr_manager', 'compliance_officer', 'employee'] },
+  { path: '/environment',  label: 'Environmental',  icon: Leaf,           roles: ['admin', 'sustainability_manager'] },
+  { path: '/social',       label: 'Social',         icon: Users,          roles: ['admin', 'sustainability_manager', 'hr_manager', 'employee'] },
+  { path: '/governance',   label: 'Governance',     icon: Shield,         roles: ['admin', 'compliance_officer'] },
+  { path: '/gamification', label: 'Gamification',   icon: Trophy,         roles: ['admin', 'sustainability_manager', 'hr_manager', 'employee'] },
+  { path: '/ai-advisor',   label: 'AI Advisor',     icon: Brain,          roles: ['admin', 'sustainability_manager', 'compliance_officer'] },
+  { path: '/simulator',    label: 'ESG Simulator',  icon: FlaskConical,   roles: ['admin', 'sustainability_manager'] },
+  { path: '/reports',      label: 'Reports',        icon: FileBarChart,   roles: ['admin', 'sustainability_manager', 'hr_manager', 'compliance_officer'] },
 ]
 
 export default function Sidebar() {
@@ -68,7 +68,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '0 8px', overflowY: 'auto' }}>
-        {navItems.map(({ path, label, icon: Icon }) => (
+        {navItems.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ path, label, icon: Icon }) => (
           <NavLink key={path} to={path} style={({ isActive }) => ({
             display: 'flex',
             alignItems: 'center',

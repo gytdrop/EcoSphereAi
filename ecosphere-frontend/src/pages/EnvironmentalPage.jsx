@@ -5,12 +5,15 @@ import { PageLoader } from '../components/ui/Spinner'
 import DataTable from '../components/ui/DataTable'
 import { Form, FormGroup, Input, Select, FormActions, SubmitButton } from '../components/ui/Form'
 import { useEnvironmentalData } from '../hooks/useEnvironmentalData'
+import { useAuthStore } from '../store/authStore'
 
 export default function EnvironmentalPage() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ department: '', emission_factor_id: '', quantity: '', notes: '' })
 
   const { transactions, isLoading, factors, goals, deptSummary, createTransaction } = useEnvironmentalData()
+  const { user } = useAuthStore()
+  const canLog = ['admin', 'sustainability_manager'].includes(user?.role)
 
   const handleSubmit = useCallback(() => {
     createTransaction.mutate(form, {
@@ -41,9 +44,11 @@ export default function EnvironmentalPage() {
           <h1 className="page-title">Environmental Management</h1>
           <p className="page-subtitle">Carbon tracking, sustainability targets, and analytics</p>
         </div>
-        <button id="add-transaction-btn" className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={14} /> Log Transaction
-        </button>
+        {canLog && (
+          <button id="add-transaction-btn" className="btn btn-primary" onClick={() => setShowModal(true)}>
+            <Plus size={14} /> Log Transaction
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
