@@ -6,14 +6,14 @@ import {
 import { useAuthStore } from '../../store/authStore'
 
 const navItems = [
-  { path: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-  { path: '/environment',  label: 'Environmental',icon: Leaf },
-  { path: '/social',       label: 'Social',       icon: Users },
-  { path: '/governance',   label: 'Governance',   icon: Shield },
-  { path: '/gamification', label: 'Gamification', icon: Trophy },
-  { path: '/ai-advisor',   label: 'AI Advisor',   icon: Brain },
-  { path: '/simulator',    label: 'ESG Simulator', icon: FlaskConical },
-  { path: '/reports',      label: 'Reports',      icon: FileBarChart },
+  { path: '/dashboard',    label: 'Dashboard',     icon: LayoutDashboard },
+  { path: '/environment',  label: 'Environmental',  icon: Leaf },
+  { path: '/social',       label: 'Social',         icon: Users },
+  { path: '/governance',   label: 'Governance',     icon: Shield },
+  { path: '/gamification', label: 'Gamification',   icon: Trophy },
+  { path: '/ai-advisor',   label: 'AI Advisor',     icon: Brain },
+  { path: '/simulator',    label: 'ESG Simulator',  icon: FlaskConical },
+  { path: '/reports',      label: 'Reports',        icon: FileBarChart },
 ]
 
 export default function Sidebar() {
@@ -27,8 +27,8 @@ export default function Sidebar() {
 
   return (
     <aside style={{
-      width: 240,
-      minWidth: 240,
+      width: 'var(--sidebar-width)',
+      minWidth: 'var(--sidebar-width)',
       background: 'var(--surface-2)',
       borderRight: '1px solid var(--border)',
       display: 'flex',
@@ -37,75 +37,87 @@ export default function Sidebar() {
       position: 'sticky',
       top: 0,
     }}>
+
       {/* Logo */}
-      <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
-            width: 36, height: 36,
+            width: 28, height: 28,
             background: 'var(--primary)',
-            borderRadius: 10,
+            borderRadius: 6,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
           }}>
-            <Sprout size={20} color="white" />
+            <Sprout size={15} color="black" />
           </div>
           <div>
-            <div style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>
-              EcoSphere
+            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+              EcoSphere AI
             </div>
-            <div style={{ fontSize: 10, color: 'var(--primary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-              AI PLATFORM
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.03em' }}>
+              ESG Management
             </div>
           </div>
         </div>
       </div>
 
+      {/* Navigation Label */}
+      <div style={{ padding: '10px 16px 4px', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        Menu
+      </div>
+
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }}>
+      <nav style={{ flex: 1, padding: '0 8px', overflowY: 'auto' }}>
         {navItems.map(({ path, label, icon: Icon }) => (
           <NavLink key={path} to={path} style={({ isActive }) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            padding: '10px 12px',
-            borderRadius: 8,
-            marginBottom: 2,
+            gap: 8,
+            padding: '7px 8px',
+            borderRadius: 6,
+            marginBottom: 1,
             textDecoration: 'none',
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 500,
-            transition: 'all 0.15s',
-            background: isActive ? 'rgba(16,185,129,0.12)' : 'transparent',
+            transition: 'background 0.1s, color 0.1s',
+            background: isActive ? 'var(--primary-muted)' : 'transparent',
             color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-            borderLeft: isActive ? '3px solid var(--primary)' : '3px solid transparent',
+            borderLeft: isActive ? '2px solid var(--primary)' : '2px solid transparent',
           })}>
-            <Icon size={16} />
+            <Icon size={15} />
             {label}
           </NavLink>
         ))}
       </nav>
 
       {/* User footer */}
-      <div style={{ padding: '16px 16px', borderTop: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+      <div style={{ padding: '10px 12px', borderTop: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <div style={{
-            width: 34, height: 34,
-            background: 'var(--primary)',
-            borderRadius: '50%',
+            width: 26, height: 26,
+            background: 'var(--surface-3)',
+            borderRadius: 4,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Poppins', fontWeight: 700, fontSize: 13, color: 'white',
+            fontWeight: 600, fontSize: 11, color: 'var(--primary)',
+            flexShrink: 0,
           }}>
-            {user?.name?.[0] || 'U'}
+            {user?.name?.[0]?.toUpperCase() || 'U'}
           </div>
-          <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ overflow: 'hidden', flex: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
               {user?.role?.replace('_', ' ')}
             </div>
           </div>
         </div>
-        <button className="btn btn-ghost btn-sm" onClick={handleLogout} style={{ width: '100%' }}>
-          <LogOut size={14} /> Sign Out
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={handleLogout}
+          style={{ width: '100%', justifyContent: 'flex-start', gap: 6, fontSize: 12 }}
+        >
+          <LogOut size={13} /> Sign Out
         </button>
       </div>
     </aside>

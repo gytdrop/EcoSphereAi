@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sprout, Eye, EyeOff, Leaf } from 'lucide-react'
+import { Sprout, Eye, EyeOff } from 'lucide-react'
 import { authService } from '../services/auth.service'
 import { useAuthStore } from '../store/authStore'
 import Spinner from '../components/ui/Spinner'
+import WebGLBackground from '../components/ui/WebGLBackground'
+import MagneticButton from '../components/ui/MagneticButton'
+import { gsap } from 'gsap'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('admin@ecosphere.ai')
@@ -13,6 +16,24 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const { login } = useAuthStore()
   const navigate = useNavigate()
+
+  const formRef = useRef(null)
+  const brandRef = useRef(null)
+
+  useEffect(() => {
+    const tl = gsap.timeline()
+
+    tl.fromTo(brandRef.current.children,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+    )
+
+    tl.fromTo(formRef.current.children,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' },
+      "-=0.4"
+    )
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -32,137 +53,199 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #0f172a 100%)',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 24,
+      alignItems: 'stretch',
       position: 'relative',
-      overflow: 'hidden',
     }}>
-      {/* Background decoration */}
-      <div style={{
-        position: 'absolute', top: '-20%', right: '-10%',
-        width: 500, height: 500,
-        background: 'rgba(16,185,129,0.07)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '-20%', left: '-10%',
-        width: 400, height: 400,
-        background: 'rgba(16,185,129,0.05)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-      }} />
+      {/* Background WebGL Component */}
+      <WebGLBackground />
 
-      <div style={{ display: 'flex', width: '100%', maxWidth: 900, gap: 0, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 60px rgba(0,0,0,0.5)', position: 'relative', zIndex: 1 }}>
-        {/* Left panel */}
-        <div style={{
-          flex: 1, background: 'rgba(16,185,129,0.1)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(16,185,129,0.2)',
-          padding: '48px 40px',
-          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
-              <div style={{ width: 44, height: 44, background: 'var(--primary)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Sprout size={24} color="white" />
-              </div>
-              <div>
-                <div style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: 20, color: 'white' }}>EcoSphere AI</div>
-                <div style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600, letterSpacing: '0.08em' }}>INTELLIGENT ESG PLATFORM</div>
-              </div>
+      {/* Left panel - Glassmorphism brand */}
+      <div style={{
+        flex: 1,
+        padding: '48px 52px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        zIndex: 10,
+        pointerEvents: 'none'
+      }}>
+        <div ref={brandRef}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
+            <div style={{ 
+              width: 40, height: 40, 
+              background: 'rgba(255,255,255,0.1)', 
+              backdropFilter: 'blur(10px)',
+              borderRadius: 12, 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}>
+              <Sprout size={20} color="#FFFFFF" />
             </div>
-            <h1 style={{ fontSize: 32, fontWeight: 800, color: 'white', lineHeight: 1.2, marginBottom: 16 }}>
-              Transforming ESG<br />Reporting into<br /><span style={{ color: 'var(--primary-light)' }}>Intelligent Decisions</span>
-            </h1>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, lineHeight: 1.7 }}>
-              Enterprise-grade ESG Management with AI-powered advisory, predictive scoring, and compliance automation.
-            </p>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 16, color: '#FFFFFF', letterSpacing: '0.05em' }}>ECOSPHERE</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Enterprise Studio</div>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {[
-              ['AI ESG Advisor', 'Intelligent sustainability recommendations'],
-              ['Smart Score Simulator', 'Predict impact before you act'],
-              ['Real-time Compliance', 'Never miss a deadline again'],
-            ].map(([title, sub]) => (
-              <div key={title} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Leaf size={14} color="var(--primary)" />
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>{title}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{sub}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <h1 style={{ 
+            fontSize: 56, 
+            fontWeight: 400, 
+            color: '#FFFFFF', 
+            lineHeight: 1.1, 
+            marginBottom: 24,
+            letterSpacing: '-0.03em'
+          }}>
+            Shaping the<br />sustainable<br />future.
+          </h1>
+          <p style={{ 
+            color: 'rgba(255,255,255,0.7)', 
+            fontSize: 16, 
+            lineHeight: 1.6, 
+            maxWidth: 340,
+            fontWeight: 300
+          }}>
+            The premier AI-driven ESG advisory and management platform. Build, track, and lead environmental governance.
+          </p>
         </div>
 
-        {/* Right panel — login form */}
-        <div style={{
-          width: 400,
-          background: 'var(--surface-2)',
-          border: '1px solid var(--border)',
-          padding: '48px 40px',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Version 2.0 · Enterprise Edition
+        </div>
+      </div>
+
+      {/* Right login form - Premium card */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 40px',
+        position: 'relative',
+        zIndex: 10
+      }}>
+        <div style={{ 
+          width: '100%', 
+          maxWidth: 400,
+          background: 'rgba(10, 10, 10, 0.6)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 24,
+          padding: '40px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.5)'
         }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6 }}>Sign In</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 32 }}>
-            Access your ESG management dashboard
-          </p>
-
-          {error && (
-            <div style={{ background: '#450a0a', border: '1px solid #7f1d1d', color: '#fca5a5', padding: '12px 16px', borderRadius: 8, fontSize: 13, marginBottom: 20 }}>
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="form-group">
-              <label className="form-label">Email Address</label>
-              <input
-                id="login-email"
-                className="form-input"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                required
-              />
+          <div ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div>
+              <h2 style={{ fontSize: 24, fontWeight: 500, marginBottom: 8, color: '#FFFFFF' }}>Access Portal</h2>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
+                Enter your credentials to continue
+              </p>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  id="login-password"
-                  className="form-input"
-                  type={showPwd ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  style={{ paddingRight: 40 }}
-                />
-                <button type="button" onClick={() => setShowPwd(!showPwd)} style={{
-                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)',
-                }}>
-                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+            {error && (
+              <div style={{ 
+                background: 'rgba(248,113,113,0.1)', 
+                border: '1px solid rgba(248,113,113,0.2)', 
+                color: '#F87171',
+                padding: '12px 16px',
+                borderRadius: 8,
+                fontSize: 13
+              }}>
+                {error}
               </div>
+            )}
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</label>
+                <input
+                  id="login-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  required
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 12,
+                    color: '#FFF',
+                    padding: '12px 16px',
+                    fontSize: 14,
+                    outline: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.3)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Password</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="login-password"
+                    type={showPwd ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    style={{
+                      width: '100%',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: 12,
+                      color: '#FFF',
+                      padding: '12px 48px 12px 16px',
+                      fontSize: 14,
+                      outline: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.3)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPwd(!showPwd)}
+                    style={{
+                      position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
+                      background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)',
+                      display: 'flex', alignItems: 'center',
+                      transition: 'color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#FFF'}
+                    onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.5)'}
+                  >
+                    {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <MagneticButton
+                id="login-submit"
+                type="submit"
+                disabled={loading}
+                style={{ 
+                  marginTop: 12, 
+                  padding: '14px', 
+                  fontSize: 14,
+                  background: '#FFFFFF',
+                  color: '#000000',
+                  borderRadius: 12,
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {loading ? <Spinner size={16} /> : 'Enter Portal'}
+              </MagneticButton>
+            </form>
+
+            <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+              Demo access: admin@ecosphere.ai / password123
             </div>
-
-            <button id="login-submit" type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ width: '100%', marginTop: 8 }}>
-              {loading ? <Spinner size={16} /> : 'Sign In to EcoSphere'}
-            </button>
-          </form>
-
-          <div style={{ marginTop: 24, padding: '16px', background: 'var(--surface-3)', borderRadius: 8 }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6 }}>DEMO CREDENTIALS</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>admin@ecosphere.ai / password123</div>
           </div>
         </div>
       </div>

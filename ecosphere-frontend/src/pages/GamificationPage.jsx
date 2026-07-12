@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Trophy, Zap, Award, Gift, CheckCircle, Play } from 'lucide-react'
+import { Trophy, Zap, Gift, CheckCircle, Play, Lock } from 'lucide-react'
 import { gamificationService } from '../services/gamification.service'
 import { useAuthStore } from '../store/authStore'
 import { PageLoader } from '../components/ui/Spinner'
@@ -24,7 +24,6 @@ export default function GamificationPage() {
   const myRank = leaderboard?.findIndex(u => u.id === user?.id) + 1
   const myXP = user?.xp || 0
   const earnedBadges = badgesData?.filter(b => b.earned).length || 0
-
   const tabs = ['challenges', 'leaderboard', 'badges', 'rewards']
 
   return (
@@ -36,101 +35,136 @@ export default function GamificationPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <div className="stat-card" style={{ background: 'rgba(16,185,129,0.05)', borderColor: 'rgba(16,185,129,0.2)' }}>
-          <div className="stat-label">Your XP</div>
-          <div className="stat-value" style={{ color: 'var(--primary)' }}>{myXP}</div>
-          <div className="stat-sub">Experience points earned</div>
+      {/* KPIs */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
+        <div className="kpi-card" style={{ borderLeft: '2px solid var(--primary)' }}>
+          <div className="kpi-label">Your XP Balance</div>
+          <div className="kpi-value" style={{ color: 'var(--primary)' }}>{myXP}</div>
+          <div className="kpi-sub">Experience points earned</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Leaderboard Rank</div>
-          <div className="stat-value" style={{ color: '#f59e0b' }}>#{myRank || '—'}</div>
-          <div className="stat-sub">Global ranking</div>
+        <div className="kpi-card">
+          <div className="kpi-label">Leaderboard Rank</div>
+          <div className="kpi-value" style={{ color: myRank === 1 ? '#FCD34D' : 'var(--text-primary)' }}>#{myRank || '—'}</div>
+          <div className="kpi-sub">Global ranking</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Badges Earned</div>
-          <div className="stat-value" style={{ color: '#8b5cf6' }}>{earnedBadges}</div>
-          <div className="stat-sub">of {badgesData?.length || 0} total badges</div>
+        <div className="kpi-card">
+          <div className="kpi-label">Badges Earned</div>
+          <div className="kpi-value">{earnedBadges}<span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text-muted)' }}>/{badgesData?.length || 0}</span></div>
+          <div className="kpi-sub">Total achievement badges</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Active Challenges</div>
-          <div className="stat-value" style={{ color: '#3b82f6' }}>{challenges?.filter(c => !c.my_status).length || 0}</div>
-          <div className="stat-sub">Available to join</div>
+        <div className="kpi-card">
+          <div className="kpi-label">Available Challenges</div>
+          <div className="kpi-value">{challenges?.filter(c => !c.my_status).length || 0}</div>
+          <div className="kpi-sub">Ready to join</div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 2, marginBottom: 20, background: 'var(--surface-2)', borderRadius: 10, padding: 4, width: 'fit-content', border: '1px solid var(--border)' }}>
+      {/* Tab bar */}
+      <div className="tab-bar">
         {tabs.map(t => (
-          <button key={t} onClick={() => setActiveTab(t)} style={{
-            padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
-            fontFamily: 'Inter', fontWeight: 500, fontSize: 13, textTransform: 'capitalize',
-            background: activeTab === t ? 'var(--primary)' : 'transparent',
-            color: activeTab === t ? 'white' : 'var(--text-muted)',
-            transition: 'all 0.15s',
-          }}>{t}</button>
+          <button key={t} className={`tab-btn ${activeTab === t ? 'active' : ''}`} onClick={() => setActiveTab(t)}>
+            {t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
         ))}
       </div>
 
+      {/* Challenges Table */}
       {activeTab === 'challenges' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-          {challenges?.map(c => (
-            <div key={c.id} className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                <div style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14 }}>{c.title}</div>
-                <div style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--primary)', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>+{c.xp} XP</div>
-              </div>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 14 }}>{c.description}</p>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>
-                Deadline: {c.deadline ? new Date(c.deadline).toLocaleDateString() : '—'}
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {!c.my_status && (
-                  <button className="btn btn-primary btn-sm" onClick={() => joinMutation.mutate(c.id)} disabled={joinMutation.isPending}>
-                    <Play size={12} /> Join Challenge
-                  </button>
-                )}
-                {c.my_status === 'in_progress' && (
-                  <button className="btn btn-ghost btn-sm" onClick={() => completeMutation.mutate(c.id)} disabled={completeMutation.isPending}>
-                    <CheckCircle size={12} /> Mark Complete
-                  </button>
-                )}
-                {c.my_status === 'completed' && (
-                  <span style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 600 }}>Completed</span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'leaderboard' && (
         <div className="card" style={{ padding: 0 }}>
-          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontFamily: 'Poppins', fontWeight: 600 }}>XP Leaderboard</div>
+          <div className="toolbar">
+            <span className="toolbar-title">ESG Challenges</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{challenges?.filter(c => c.my_status === 'in_progress').length || 0} in progress</span>
+          </div>
           <div className="table-wrapper">
             <table>
               <thead>
-                <tr><th>#</th><th>Employee</th><th>Department</th><th>XP</th><th>Badges</th><th>Challenges</th></tr>
+                <tr>
+                  <th>Challenge</th>
+                  <th>XP Reward</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {challenges?.map(c => (
+                  <tr key={c.id}>
+                    <td>
+                      <div style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: 12 }}>{c.title}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>{c.description?.substring(0, 70)}</div>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 500, color: 'var(--primary)', fontSize: 12 }}>+{c.xp} XP</span>
+                    </td>
+                    <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                      {c.deadline ? new Date(c.deadline).toLocaleDateString() : '—'}
+                    </td>
+                    <td>
+                      {!c.my_status && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Not Joined</span>}
+                      {c.my_status === 'in_progress' && <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--warning)' }}>In Progress</span>}
+                      {c.my_status === 'completed' && <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--primary)' }}>Completed</span>}
+                    </td>
+                    <td>
+                      {!c.my_status && (
+                        <button className="btn btn-primary btn-sm" onClick={() => joinMutation.mutate(c.id)} disabled={joinMutation.isPending}>
+                          <Play size={11} /> Join
+                        </button>
+                      )}
+                      {c.my_status === 'in_progress' && (
+                        <button className="btn btn-ghost btn-sm" onClick={() => completeMutation.mutate(c.id)} disabled={completeMutation.isPending}>
+                          <CheckCircle size={11} /> Complete
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {(!challenges || challenges.length === 0) && (
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>No challenges available</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Leaderboard Table */}
+      {activeTab === 'leaderboard' && (
+        <div className="card" style={{ padding: 0 }}>
+          <div className="toolbar">
+            <span className="toolbar-title">XP Leaderboard</span>
+          </div>
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th style={{ textAlign: 'right' }}>XP</th>
+                  <th style={{ textAlign: 'center' }}>Badges</th>
+                  <th style={{ textAlign: 'center' }}>Challenges</th>
+                </tr>
               </thead>
               <tbody>
                 {leaderboard?.map((u, i) => (
-                  <tr key={u.id} style={{ background: u.id === user?.id ? 'rgba(16,185,129,0.06)' : undefined }}>
+                  <tr key={u.id} style={{ background: u.id === user?.id ? 'rgba(34,197,94,0.05)' : undefined }}>
                     <td>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: '50%',
-                        background: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#c2882a' : 'var(--surface-3)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, fontSize: 12, color: i < 3 ? 'white' : 'var(--text-muted)',
-                      }}>{i + 1}</div>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: 4, fontSize: 10, fontWeight: 500,
+                        background: i === 0 ? 'rgba(245,158,11,0.15)' : i === 1 ? 'rgba(156,163,175,0.15)' : 'var(--surface-3)',
+                        color: i < 2 ? (i === 0 ? '#FCD34D' : '#9CA3AF') : 'var(--text-muted)',
+                      }}>{i + 1}</span>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600, color: u.id === user?.id ? 'var(--primary)' : 'var(--text-primary)' }}>
-                        {u.name} {u.id === user?.id && <span style={{ fontSize: 11 }}>(You)</span>}
-                      </div>
+                      <span style={{ fontWeight: u.id === user?.id ? 500 : 500, color: u.id === user?.id ? 'var(--primary)' : 'var(--text-primary)', fontSize: 12 }}>
+                        {u.name} {u.id === user?.id && <span style={{ fontSize: 10, fontWeight: 400, color: 'var(--primary)' }}>(You)</span>}
+                      </span>
                     </td>
                     <td style={{ color: 'var(--text-muted)' }}>{u.department}</td>
-                    <td style={{ fontWeight: 700, color: 'var(--primary)', fontSize: 15 }}>{u.xp}</td>
-                    <td>{u.badge_count}</td>
-                    <td>{u.challenges_completed}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 500, color: 'var(--primary)', fontSize: 13 }}>{u.xp}</td>
+                    <td style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{u.badge_count}</td>
+                    <td style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{u.challenges_completed}</td>
                   </tr>
                 ))}
               </tbody>
@@ -139,59 +173,85 @@ export default function GamificationPage() {
         </div>
       )}
 
+      {/* Badges Grid */}
       {activeTab === 'badges' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
-          {badgesData?.map(b => (
-            <div key={b.id} className="card" style={{
-              textAlign: 'center',
-              opacity: b.earned ? 1 : 0.45,
-              borderColor: b.earned ? 'rgba(16,185,129,0.3)' : 'var(--border)',
-              background: b.earned ? 'rgba(16,185,129,0.05)' : 'var(--surface-2)',
-            }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>
-                {b.earned ? '🏅' : '🔒'}
+        <div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+            {badgesData?.map(b => (
+              <div key={b.id} className="card" style={{
+                opacity: b.earned ? 1 : 0.5,
+                borderLeft: b.earned ? '2px solid var(--primary)' : '2px solid var(--border)',
+                padding: '12px 14px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  {b.earned
+                    ? <Trophy size={14} color="var(--primary)" />
+                    : <Lock size={13} color="var(--text-muted)" />
+                  }
+                  <div style={{ fontWeight: 500, fontSize: 12, color: b.earned ? 'var(--text-primary)' : 'var(--text-muted)' }}>{b.name}</div>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: 4 }}>{b.description}</div>
+                {b.xp_threshold && <div style={{ fontSize: 10, color: 'var(--primary)', fontWeight: 500 }}>Requires {b.xp_threshold} XP</div>}
+                {b.earned && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Earned {new Date(b.earned_at).toLocaleDateString()}</div>}
               </div>
-              <div style={{ fontFamily: 'Poppins', fontWeight: 600, marginBottom: 6 }}>{b.name}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 }}>{b.description}</div>
-              {b.xp_threshold && <div style={{ fontSize: 11, color: 'var(--primary)', marginTop: 8, fontWeight: 600 }}>Requires {b.xp_threshold} XP</div>}
-              {b.earned && <div style={{ fontSize: 11, color: 'var(--primary)', marginTop: 6 }}>Earned {new Date(b.earned_at).toLocaleDateString()}</div>}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
+      {/* Rewards */}
       {activeTab === 'rewards' && (
         <div>
-          <div style={{ marginBottom: 16, padding: '12px 16px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <Zap size={16} color="var(--primary)" />
-            <span style={{ fontWeight: 600, color: 'var(--primary)' }}>Your XP Balance: {rewardsData?.userXP || 0} points</span>
+          <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Zap size={14} color="var(--primary)" />
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--primary)' }}>XP Balance: {rewardsData?.userXP || 0} points</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
-            {rewardsData?.data?.map(r => {
-              const canRedeem = (rewardsData?.userXP || 0) >= r.points_required
-              return (
-                <div key={r.id} className="card">
-                  <div style={{ fontFamily: 'Poppins', fontWeight: 600, marginBottom: 6 }}>{r.title}</div>
-                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.4 }}>{r.description}</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: 18 }}>{r.points_required} XP</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.stock} left</div>
-                  </div>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    style={{ width: '100%', marginTop: 12 }}
-                    onClick={() => redeemMutation.mutate(r.id)}
-                    disabled={!canRedeem || redeemMutation.isPending}
-                  >
-                    <Gift size={12} /> {canRedeem ? 'Redeem' : `Need ${r.points_required - rewardsData?.userXP} more XP`}
-                  </button>
-                </div>
-              )
-            })}
+          <div className="card" style={{ padding: 0 }}>
+            <div className="toolbar">
+              <span className="toolbar-title">Available Rewards</span>
+            </div>
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Reward</th>
+                    <th>Description</th>
+                    <th style={{ textAlign: 'center' }}>XP Required</th>
+                    <th style={{ textAlign: 'center' }}>Stock</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rewardsData?.data?.map(r => {
+                    const canRedeem = (rewardsData?.userXP || 0) >= r.points_required
+                    return (
+                      <tr key={r.id}>
+                        <td style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: 12 }}>{r.title}</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: 11, maxWidth: 200 }}>{r.description}</td>
+                        <td style={{ textAlign: 'center', fontWeight: 500, color: canRedeem ? 'var(--primary)' : 'var(--text-muted)', fontSize: 12 }}>{r.points_required}</td>
+                        <td style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{r.stock}</td>
+                        <td>
+                          <button
+                            className={`btn btn-sm ${canRedeem ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => redeemMutation.mutate(r.id)}
+                            disabled={!canRedeem || redeemMutation.isPending}
+                          >
+                            <Gift size={11} />
+                            {canRedeem ? 'Redeem' : `${r.points_required - (rewardsData?.userXP || 0)} more XP`}
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {(!rewardsData?.data || rewardsData.data.length === 0) && (
+                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>No rewards available</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
     </div>
   )
 }
-
