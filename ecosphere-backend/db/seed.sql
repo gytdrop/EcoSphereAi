@@ -12,7 +12,10 @@ INSERT INTO users (name, email, password_hash, role, department, xp) VALUES
   ('Sarah Chen',         'sustain@eco.com',       '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'sustainability_manager', 'Sustainability',  340),
   ('James Patel',        'hr@eco.com',            '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'hr_manager',             'Human Resources', 210),
   ('Amara Osei',         'compliance@eco.com',    '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'compliance_officer',     'Legal',           280),
-  ('David Kim',          'employee@eco.com',      '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'employee',               'Engineering',     150);
+  ('David Kim',          'employee@eco.com',      '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'employee',               'Engineering',     150),
+  ('Priya Sharma',       'priya@eco.com',         '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'employee',               'Marketing',       90),
+  ('Marcus Williams',    'marcus@eco.com',        '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'employee',               'Executive',       600),
+  ('Lena Mueller',       'lena@eco.com',          '$2a$10$j/q2iOLLorDXkqfznaILneik2iWNgW9LfHGOjlDwL/k0zlPBnwKUy', 'employee',               'Operations',      175);
 
 -- Emission Factors
 INSERT INTO emission_factors (name, value, unit, category) VALUES
