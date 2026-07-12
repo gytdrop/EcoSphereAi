@@ -77,46 +77,52 @@ Overall = (Environmental × 0.40) + (Social × 0.30) + (Governance × 0.30)
 ```
 Weights are configurable via the `esg_weights` table.
 
-## Platform Screenshots
+## Platform Overview & Features
 
-### 1. Dashboard
-The main command center for the Enterprise ESG Platform. It provides an at-a-glance view of overall scores, compliance status, and emissions trajectories.
-![Dashboard](assets/dashboard.png)
+Our platform is divided into several powerful modules to tackle enterprise ESG challenges holistically. Below is a detailed breakdown of each feature, accompanied by interactive screenshots showing the application in action.
 
-### 2. Environmental Impact
-Track Scope 1, 2, and 3 emissions, energy consumption, and environmental targets over time.
-![Environmental](assets/environmental.png)
+### 1. Centralized ESG Dashboard
+The **Dashboard** serves as the command center for sustainability officers. It features high-level metrics, real-time KPI tracking, and interactive charts that visualize carbon emissions, social engagement, and governance compliance over time.
+* **Interactive Tooltips**: Hovering over the graphs displays granular data points for precise analysis.
+![Dashboard Chart Hover](assets/dashboard-hover.png)
+![Dashboard Overview](assets/dashboard.png)
 
-### 3. Social Metrics
-Monitor community engagement, workplace safety, diversity, and internal CSR program participation.
-![Social](assets/social.png)
+### 2. Environmental Management
+The **Environmental** module tracks Scope 1, 2, and 3 emissions. Users can dynamically add new energy consumption logs, waste metrics, or water usage data.
+* **Dynamic Modals**: Users can click "Record Transaction" to quickly log new data without leaving the page. 
+![Environmental Data Modal](assets/environmental-modal.png)
+![Environmental Page](assets/environmental.png)
+
+### 3. Social Impact & Community
+The **Social** module manages employee volunteering, community initiatives, and diversity metrics. 
+* **Interactive Approval Flows**: Managers can click on individual social activities to approve or reject them directly from intuitive interactive modals.
+![Social Activity Modal](assets/social-modal.png)
+![Social Page](assets/social.png)
 
 ### 4. Governance & Compliance
-Ensure regulatory compliance with an overview of audits, open issues, and governance scoring metrics.
+The **Governance** module ensures that the organization remains compliant with regional frameworks like GDPR, CSRD, and ISO certifications. It provides automated checklists, policy tracking, and audit readiness scores.
 ![Governance](assets/governance.png)
 
 ### 5. Gamification & Leaderboard
-Drive employee engagement in sustainability via gamified leaderboards, XP, and badges.
+To drive grassroots employee engagement, the **Gamification** module tracks individual and departmental contributions to sustainability goals. Employees earn XP and badges for sustainable actions, fostering a culture of positive impact.
 ![Gamification](assets/gamification.png)
 
-### 6. AI Advisor
-Interact with the Groq-powered AI for automated sustainability insights, policy recommendations, and dynamic answers to ESG questions.
+### 6. Groq-Powered AI Advisor
+Our **AI Advisor** leverages the blazing-fast Groq LPU engine to provide real-time sustainability insights, tailored policy recommendations, and dynamic answers to complex ESG questions based on the enterprise's live data.
 ![AI Advisor](assets/ai-advisor.png)
 
+#### AI Advisor Output
+By clicking "Generate Report", the Groq-powered model analyzes the latest enterprise metrics and outputs a comprehensive Executive ESG Report, highlighting strengths, vulnerabilities, and high-impact priority actions.
+![AI Advisor Result](assets/ai-advisor-result.png)
 
 ### 7. ESG Simulator
-Test potential business decisions (like adopting solar or shifting supply chains) and instantly simulate their impact on the company's overall ESG score.
+The **ESG Simulator** allows decision-makers to model the potential impact of future business choices—like adopting 100% renewable energy or altering supply chains.
 ![ESG Simulator](assets/simulator.png)
 
 #### Live Simulation Results
-Adjust variables to instantly see the projected impact on your Environmental, Social, and Governance scores.
+By adjusting the sliders, users can instantly see how hypothetical changes will affect their projected Environmental, Social, and Governance scores.
 ![Simulator Results](assets/simulator-result.png)
 
-### 8. Interactive Modals & Tooltips
-Deep-dive into specific metrics and add new transactions via intuitive modals and rich tooltips.
-![Dashboard Chart Hover](assets/dashboard-hover.png)
-![Social Activity Modal](assets/social-modal.png)
-
-### 9. Reports & Analytics
-Generate comprehensive ESG reports for stakeholders and investors, highlighting compliance readiness and historical progress.
+### 8. Reports & Analytics
+Generate comprehensive, board-ready ESG reports for stakeholders and investors, highlighting compliance readiness, historical progress, and future trajectories.
 ![Reports](assets/reports.png)
