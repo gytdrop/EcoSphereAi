@@ -39,9 +39,11 @@ npm run dev
 ### Demo Login
 | Email | Password | Role |
 |---|---|---|
-| admin@ecosphere.ai | password123 | Admin |
-| sarah@ecosphere.ai | password123 | Sustainability Manager |
-| amara@ecosphere.ai | password123 | Compliance Officer |
+| admin@eco.com | admin123 | Admin |
+| sustain@eco.com | admin123 | Sustainability Manager |
+| compliance@eco.com | admin123 | Compliance Officer |
+| hr@eco.com | admin123 | HR Manager |
+| employee@eco.com | admin123 | Employee |
 
 ## Architecture
 
@@ -71,3 +73,37 @@ ecosphere-frontend/          React + Vite + Tailwind CSS
 Overall = (Environmental × 0.40) + (Social × 0.30) + (Governance × 0.30)
 ```
 Weights are configurable via the `esg_weights` table.
+
+## Platform Screenshots
+
+### 1. Dashboard
+The main command center for the Enterprise ESG Platform. It provides an at-a-glance view of overall scores, compliance status, and emissions trajectories.
+![Dashboard](assets/dashboard.png)
+
+### 2. Environmental Impact
+Track Scope 1, 2, and 3 emissions, energy consumption, and environmental targets over time.
+![Environmental](assets/environmental.png)
+
+### 3. Social Metrics
+Monitor community engagement, workplace safety, diversity, and internal CSR program participation.
+![Social](assets/social.png)
+
+### 4. Governance & Compliance
+Ensure regulatory compliance with an overview of audits, open issues, and governance scoring metrics.
+![Governance](assets/governance.png)
+
+### 5. Gamification & Leaderboard
+Drive employee engagement in sustainability via gamified leaderboards, XP, and badges.
+![Gamification](assets/gamification.png)
+
+### 6. AI Advisor
+Interact with the Groq-powered AI for automated sustainability insights, policy recommendations, and dynamic answers to ESG questions.
+![AI Advisor](assets/ai-advisor.png)
+
+### 7. ESG Simulator
+Test potential business decisions (like adopting solar or shifting supply chains) and instantly simulate their impact on the company's overall ESG score.
+![ESG Simulator](assets/simulator.png)
+
+### 8. Reports & Analytics
+Generate comprehensive ESG reports for stakeholders and investors, highlighting compliance readiness and historical progress.
+![Reports](assets/reports.png)

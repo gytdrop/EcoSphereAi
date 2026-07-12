@@ -9,10 +9,10 @@ import { motion } from 'framer-motion'
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: 'rgba(20,20,20,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '12px 16px' }}>
-        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+      <div style={{ background: 'rgba(250,250,250,0.95)', backdropFilter: 'blur(10px)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>{label}</div>
         {payload.map((p) => (
-          <div key={p.name} style={{ color: '#FFFFFF', fontSize: 14, fontWeight: 500 }}>
+          <div key={p.name} style={{ color: '#111827', fontSize: 15, fontWeight: 700 }}>
             {p.value?.toLocaleString()} kg CO₂
           </div>
         ))}
@@ -42,11 +42,11 @@ function KpiCard({ label, value, sub, color, trend }) {
 }
 
 function ScoreKpi({ label, score, icon: Icon }) {
-  const color = score >= 75 ? '#FFFFFF' : score >= 50 ? 'var(--warning)' : 'var(--danger)'
+  const color = score >= 75 ? '#111827' : score >= 50 ? 'var(--warning)' : 'var(--danger)'
   return (
     <motion.div variants={cardVariants} className="kpi-card" whileHover={{ scale: 1.02 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <div style={{ background: 'rgba(255,255,255,0.05)', padding: 6, borderRadius: 6 }}>
+        <div style={{ background: 'rgba(0,0,0,0.05)', padding: 6, borderRadius: 6 }}>
           <Icon size={14} color={color} />
         </div>
         <span className="kpi-label">{label}</span>
@@ -54,7 +54,7 @@ function ScoreKpi({ label, score, icon: Icon }) {
       <div className="kpi-value" style={{ color }}>
         {score}<span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 2 }}>/100</span>
       </div>
-      <div className="progress-bar" style={{ marginTop: 12, height: 3, background: 'rgba(255,255,255,0.1)' }}>
+      <div className="progress-bar" style={{ marginTop: 12, height: 3, background: 'rgba(0,0,0,0.1)' }}>
         <motion.div 
           className="progress-fill" 
           initial={{ width: 0 }}
@@ -91,10 +91,10 @@ export default function DashboardPage() {
       variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
     >
       {/* Page header */}
-      <motion.div variants={cardVariants} className="page-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 24, marginBottom: 32 }}>
+      <motion.div variants={cardVariants} className="page-header" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: 24, marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 400, color: '#FFFFFF', letterSpacing: '-0.02em' }}>Intelligence Center</h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Welcome back, {user?.name}. Here is your enterprise sustainability overview.</p>
+          <h1 style={{ fontSize: 32, fontWeight: 400, color: '#111827', letterSpacing: '-0.02em' }}>Intelligence Center</h1>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>Welcome back, {user?.name}. Here is your enterprise sustainability overview.</p>
         </div>
       </motion.div>
 
@@ -103,8 +103,8 @@ export default function DashboardPage() {
         <motion.div variants={cardVariants} className="alert alert-danger" style={{ marginBottom: 24, padding: '16px 20px', borderRadius: 12, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)' }}>
           <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F87171" />
           <span style={{ color: '#FCA5A5' }}>
-            <strong style={{ color: '#FFF' }}>{compliance.open_issues} open compliance issues</strong> — {compliance.critical_issues} critical, {compliance.overdue_issues} overdue.
-            {' '}<span style={{ color: 'rgba(255,255,255,0.6)' }}>Review in the Governance module.</span>
+            <strong style={{ color: '#111827' }}>{compliance.open_issues} open compliance issues</strong> — {compliance.critical_issues} critical, {compliance.overdue_issues} overdue.
+            {' '}<span style={{ color: 'rgba(0,0,0,0.6)' }}>Review in the Governance module.</span>
           </span>
         </motion.div>
       )}
@@ -123,7 +123,7 @@ export default function DashboardPage() {
           label="Active CSR Programs"
           value={csr.active_csr}
           sub={`${csr.total_participants} total participants`}
-          color="#FFFFFF"
+          color="#111827"
         />
         <KpiCard
           label="Open Issues"
@@ -135,13 +135,13 @@ export default function DashboardPage() {
           label="Overdue Actions"
           value={compliance.overdue_issues}
           sub="Require immediate attention"
-          color={Number(compliance.overdue_issues) > 0 ? 'var(--danger)' : '#FFFFFF'}
+          color={Number(compliance.overdue_issues) > 0 ? 'var(--danger)' : '#111827'}
         />
         <KpiCard
           label="Weight Config (E/S/G)"
           value={`${scores.weights.environmental}/${scores.weights.social}/${scores.weights.governance}`}
           sub="Current scoring model"
-          color="#FFFFFF"
+          color="#111827"
         />
       </div>
 
@@ -150,25 +150,25 @@ export default function DashboardPage() {
 
         {/* Emission Trend */}
         <motion.div variants={cardVariants} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="toolbar" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="toolbar" style={{ background: 'rgba(0,0,0,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <span className="toolbar-title" style={{ fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Emissions Trajectory</span>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Monthly CO₂ (kg)</span>
+            <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)' }}>Monthly CO₂ (kg)</span>
           </div>
           <div style={{ padding: '24px 24px 16px' }}>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={emissionTrend} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
+                <YAxis tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.1)', strokeWidth: 1 }} />
                 <Line
                   type="monotone"
                   dataKey="total_emissions"
                   name="CO₂ Emissions"
-                  stroke="#FFFFFF"
+                  stroke="#111827"
                   strokeWidth={2}
-                  dot={{ fill: '#000', stroke: '#FFF', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, fill: '#FFF' }}
+                  dot={{ fill: '#000', stroke: '#111827', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, fill: '#111827' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -177,35 +177,35 @@ export default function DashboardPage() {
 
         {/* Leaderboard */}
         <motion.div variants={cardVariants} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="toolbar" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="toolbar" style={{ background: 'rgba(0,0,0,0.02)', padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <span className="toolbar-title" style={{ fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Top Contributors</span>
           </div>
           <div style={{ padding: '8px 0' }}>
             <table style={{ width: '100%' }}>
               <thead>
                 <tr>
-                  <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Employee</th>
-                  <th style={{ padding: '12px 20px', textAlign: 'right', fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Impact</th>
+                  <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 10, color: 'rgba(0,0,0,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Employee</th>
+                  <th style={{ padding: '12px 20px', textAlign: 'right', fontSize: 10, color: 'rgba(0,0,0,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Impact</th>
                 </tr>
               </thead>
               <tbody>
                 {leaderboard?.slice(0, 6).map((u, i) => (
-                  <tr key={u.id} style={{ borderBottom: i !== 5 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
+                  <tr key={u.id} style={{ borderBottom: i !== 5 ? '1px solid rgba(0,0,0,0.03)' : 'none' }}>
                     <td style={{ padding: '12px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{
-                          width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 11, color: '#FFF', fontWeight: 500, border: '1px solid rgba(255,255,255,0.1)'
+                          width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 11, color: '#111827', fontWeight: 500, border: '1px solid var(--border)'
                         }}>
                           {u.name.charAt(0)}
                         </div>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: '#FFFFFF' }}>{u.name}</div>
-                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{u.department}</div>
+                          <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{u.name}</div>
+                          <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)' }}>{u.department}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: '12px 20px', textAlign: 'right', fontSize: 13, fontWeight: 500, color: '#FFFFFF' }}>{u.xp} <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>XP</span></td>
+                    <td style={{ padding: '12px 20px', textAlign: 'right', fontSize: 13, fontWeight: 500, color: '#111827' }}>{u.xp} <span style={{ color: 'rgba(0,0,0,0.4)', fontSize: 11 }}>XP</span></td>
                   </tr>
                 ))}
               </tbody>

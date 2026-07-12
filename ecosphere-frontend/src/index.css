@@ -1,37 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
   /* Primary */
-  --primary: #F3F4F6;
-  --primary-dark: #FFFFFF;
-  --primary-light: #FFFFFF;
-  --primary-muted: rgba(255,255,255,0.05);
+  --primary: #111827;
+  --primary-dark: #000000;
+  --primary-light: #374151;
+  --primary-muted: rgba(17, 24, 39, 0.05);
 
-  /* Surfaces - Agency Dark */
-  --surface: #050505;
-  --surface-2: rgba(25, 25, 25, 0.4);
-  --surface-3: rgba(40, 40, 40, 0.6);
-  --surface-4: rgba(60, 60, 60, 0.8);
+  /* Surfaces - Agency Light */
+  --surface: #F9FAFB;
+  --surface-2: rgba(255, 255, 255, 0.7);
+  --surface-3: rgba(255, 255, 255, 0.9);
+  --surface-4: #FFFFFF;
 
   /* Borders */
-  --border: rgba(255,255,255,0.06);
-  --border-strong: rgba(255,255,255,0.12);
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.16);
 
   /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #6B7280;
 
   /* Status */
-  --danger: #F87171;
-  --danger-bg: rgba(248,113,113,0.08);
-  --danger-border: rgba(248,113,113,0.15);
-  --warning: #FBBF24;
-  --warning-bg: rgba(251,191,36,0.08);
-  --warning-border: rgba(251,191,36,0.15);
-  --success: #34D399;
-  --info: #9CA3AF;
+  --danger: #EF4444;
+  --danger-bg: rgba(239, 68, 68, 0.08);
+  --danger-border: rgba(239, 68, 68, 0.15);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.08);
+  --warning-border: rgba(245, 158, 11, 0.15);
+  --success: #10B981;
+  --info: #6B7280;
 
   /* Layout */
   --radius: 16px;
@@ -39,8 +39,8 @@
   --sidebar-width: 240px; 
 
   /* Shadows - Minimalist */
-  --shadow-sm: 0 4px 20px rgba(0,0,0,0.4);
-  --shadow: 0 10px 40px rgba(0,0,0,0.6);
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.04);
+  --shadow: 0 10px 40px rgba(0,0,0,0.08);
 }
 
 * {
@@ -52,8 +52,8 @@
 body {
   background-color: var(--surface);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 14px; /* Slightly larger body size */
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 15px; /* Slightly larger for Outfit */
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,7 +61,7 @@ body {
 
 /* Enforce medium weight over bold */
 h1, h2, h3, h4, h5, h6, strong, b {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 500; 
   color: var(--text-primary);
 }
