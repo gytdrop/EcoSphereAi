@@ -103,10 +103,20 @@ Drive employee engagement in sustainability via gamified leaderboards, XP, and b
 Interact with the Groq-powered AI for automated sustainability insights, policy recommendations, and dynamic answers to ESG questions.
 ![AI Advisor](assets/ai-advisor.png)
 
+
 ### 7. ESG Simulator
 Test potential business decisions (like adopting solar or shifting supply chains) and instantly simulate their impact on the company's overall ESG score.
 ![ESG Simulator](assets/simulator.png)
 
-### 8. Reports & Analytics
+#### Live Simulation Results
+Adjust variables to instantly see the projected impact on your Environmental, Social, and Governance scores.
+![Simulator Results](assets/simulator-result.png)
+
+### 8. Interactive Modals & Tooltips
+Deep-dive into specific metrics and add new transactions via intuitive modals and rich tooltips.
+![Dashboard Chart Hover](assets/dashboard-hover.png)
+![Social Activity Modal](assets/social-modal.png)
+
+### 9. Reports & Analytics
 Generate comprehensive ESG reports for stakeholders and investors, highlighting compliance readiness and historical progress.
 ![Reports](assets/reports.png)

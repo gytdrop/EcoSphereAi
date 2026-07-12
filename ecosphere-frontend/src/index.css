@@ -188,7 +188,7 @@ h1, h2, h3, h4, h5, h6, strong, b {
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn-primary  { background: var(--primary); color: #000; }
+.btn-primary  { background: var(--primary); color: #FFFFFF; }
 .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
 
 .btn-ghost {
